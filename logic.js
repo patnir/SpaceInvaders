@@ -22,7 +22,7 @@ var shot;
 
 function body_load() {
 
-    canGame.onclick = canGame_onclick;
+    //canGame.onclick = canGame_onclick;
     gCanvas = canGame.getContext("2d");
 
     gameInit();
@@ -54,7 +54,7 @@ function gameInit() {
         }
     }
     gShip = new Object();
-    gShip.X = 135;
+    gShip.X = 110;
     gShip.Y = 440;
     gShip.Width = 100;
     gShip.Height = 20;
@@ -105,13 +105,37 @@ function gameUpdate() {
 }
 
 function gameDraw() {
-
-    gCanvas.fillStyle = "black";
-    gCanvas.fillRect(0, 0, 320, 480);
-
+    drawBoard();
+    drawButtonPanel();
     drawInvaders();
     moveBoard();
     drawBullet();
+    drawButtonPanel();
+    drawButtons();
+}
+
+function drawButtonPanel() {
+    gCanvas.fillStyle = "white";
+    gCanvas.fillRect(320, 0, 100, 480);
+}
+
+function drawButtons() {
+    gCanvas.fillStyle = "black";
+    gCanvas.fillRect(330, 10, 80, 40);
+    gCanvas.fillStyle = "white";
+    gCanvas.font = "20px Microsoft Sans Serif"
+    gCanvas.fillText("Pause", 340, 35)
+
+    gCanvas.fillStyle = "black";
+    gCanvas.fillRect(330, 60, 80, 40);
+    gCanvas.fillStyle = "white";
+    gCanvas.font = "20px Microsoft Sans Serif"
+    gCanvas.fillText("Restart", 340, 85)
+}
+
+function drawBoard() {
+    gCanvas.fillStyle = "black";
+    gCanvas.fillRect(0, 0, 320, 480);
 }
 
 function drawInvaders() {
@@ -133,6 +157,7 @@ function drawInvaders() {
 }
 
 function moveBoard() {
+    console.log(gShip.X);
     if (rightDown === true) {
         gShip.X += 20;
         rightDown = false;
