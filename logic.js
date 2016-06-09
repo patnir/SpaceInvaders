@@ -1,28 +1,20 @@
 // Global variables.
 var gCanvas;
 var gCounter;
-var gInvaders
-
+var gInvaders;
+var gamePaused = false;
 var gShip;
-
 var gBullet;
-
 var spaceDown;
-
 var rightDown;
 var leftDown;
-
 var invadersAlive;
-
 var spaceDown;
-
 var canFire = true;
-
 var shot;
 
 function body_load() {
-
-    //canGame.onclick = canGame_onclick;
+    canGame.onclick = checkPaused_onclick;
     gCanvas = canGame.getContext("2d");
 
     gameInit();
@@ -65,27 +57,36 @@ function gameInit() {
 }
 
 function gameLoop() {
-
-    gameUpdate();
-    gameDraw();
+    if (gamePaused != true) {
+        gameUpdate();
+        gameDraw();
+        drawButtonPanel();
+        drawInvaders();
+        moveBoard();
+        drawBullet();
+        drawButtonPanel();
+        drawButtons();
+    }
 }
 
 window.addEventListener('keydown', function (event) {
-    switch (event.keyCode) {
-        case 37:
-            rightDown = false;
-            leftDown = true;
-            break;
+    if (gamePaused === false) {
+        switch (event.keyCode) {
+            case 37:
+                rightDown = false;
+                leftDown = true;
+                break;
 
-        case 39:
-            rightDown = true;
-            leftDown = false;
-            break;
+            case 39:
+                rightDown = true;
+                leftDown = false;
+                break;
 
-        case 32:
-            spaceDown = true;
-            shot = true;
-            break;
+            case 32:
+                spaceDown = true;
+                shot = true;
+                break;
+        }
     }
 }, false);
 
@@ -94,7 +95,6 @@ function canGame_onclick(event) {
 }
 
 function gameUpdate() {
-
     if (gCounter > 15) {
         gCounter = 0;
         for (var i = 0; i < gInvaders.length; i++) {
@@ -105,13 +105,8 @@ function gameUpdate() {
 }
 
 function gameDraw() {
-    drawBoard();
-    drawButtonPanel();
-    drawInvaders();
-    moveBoard();
-    drawBullet();
-    drawButtonPanel();
-    drawButtons();
+    gCanvas.fillStyle = "black";
+    gCanvas.fillRect(0, 0, 320, 480);
 }
 
 function drawButtonPanel() {
@@ -133,9 +128,28 @@ function drawButtons() {
     gCanvas.fillText("Restart", 340, 85)
 }
 
-function drawBoard() {
-    gCanvas.fillStyle = "black";
-    gCanvas.fillRect(0, 0, 320, 480);
+function checkPaused_onclick(event) {
+    if (event.clientX >= 330 && event.clientX <= 420) {
+        if (event.clientY >= 10 && event.clientY <= 50) {
+            if (gamePaused === true) {
+                gamePaused = false;
+                return;
+            }
+            else {
+                gamePaused = true;
+                return;
+            }
+        }
+    }
+    if (event.clientX >= 330 && event.clientX <= 420) {
+        if (event.clientY >= 60 && event.clientY <= 100) {
+            gameInit();
+            if (gamePaused === true) {
+                gamePaused = false;
+                return;
+            }
+        }
+    }
 }
 
 function drawInvaders() {
@@ -157,12 +171,11 @@ function drawInvaders() {
 }
 
 function moveBoard() {
-    console.log(gShip.X);
-    if (rightDown === true) {
+    if (rightDown === true && gamePaused != true) {
         gShip.X += 20;
         rightDown = false;
     }
-    if (leftDown === true) {
+    if (leftDown === true && gamePaused != true) {
         gShip.X -= 20;
         leftDown = false
     }
@@ -180,18 +193,18 @@ function moveBoard() {
 }
 
 function drawBullet() {
-    if (shot === true) {
+    if (shot === true && gamePaused != true) {
         gCanvas.fillStyle = "green";
         gBullet.Y -= 15;
         gCanvas.fillRect(gBullet.X, gBullet.Y, gBullet.Width, gBullet.Height);
     }
 
-    if (gBullet.Y < -20) {
+    if (gBullet.Y < -20 && gamePaused != true) {
         canFire = true;
         shot = false;
     }
 
-    if (spaceDown === true && canFire === true) {
+    if (spaceDown === true && canFire === true && gamePaused != true) {
         gCanvas.fillStyle = "green";
         gBullet.X = gShip.X + gShip.Width / 2;
         gBullet.Y = gShip.Y - gBullet.Height;
@@ -200,8 +213,4 @@ function drawBullet() {
         shot = true;
         spaceDown = false;
     }
-}
-
-function checkAlive() {
-    return true;
 }
