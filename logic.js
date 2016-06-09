@@ -1,5 +1,4 @@
 // Global variables.
-
 var gCanvas;
 var gCounter;
 var gInvaders
@@ -33,14 +32,25 @@ function gameInit() {
     gCounter = 0;
 
     gInvaders = [];
-    gInvaders[0] = new Object();
-    gInvaders[0].X = 10;
-    gInvaders[0].Y = 10;
 
-    gInvaders[1] = new Object();
-    gInvaders[1].X = 100;
-    gInvaders[1].Y = 10;
+    totalInvaders = 9
 
+    x = 20;
+    y = 10;
+
+    for (var i = 0; i < totalInvaders; i++) {
+        console.log(i, x, y);
+        gInvaders[i] = new Object();
+        gInvaders[i].X = x;
+        gInvaders[i].Y = y;
+        console.log(i, gInvaders[i].X, gInvaders[i].Y);
+        if ((i + 1) % 3 === 0 ) {
+            y += 70;
+            x = 20;
+        } else {
+            x = x + 100;
+        }
+    }
     gShip = new Object();
     gShip.X = 135;
     gShip.Y = 440;
@@ -143,6 +153,3 @@ function gameDraw() {
         spaceDown = false;
     }
 }
-
-// When the bullet is shot (shoot == true) it will move up
-// When the bullet has not been shot yet, it will stay where it is 
