@@ -12,6 +12,8 @@ var spaceDown;
 var rightDown;
 var leftDown;
 
+var invadersAlive;
+
 var spaceDown;
 
 var canFire = true;
@@ -32,6 +34,7 @@ function gameInit() {
     gCounter = 0;
 
     gInvaders = [];
+    invadersAlive = [];
 
     totalInvaders = 9
 
@@ -39,11 +42,10 @@ function gameInit() {
     y = 10;
 
     for (var i = 0; i < totalInvaders; i++) {
-        console.log(i, x, y);
+        invadersAlive[i] = true;
         gInvaders[i] = new Object();
         gInvaders[i].X = x;
         gInvaders[i].Y = y;
-        console.log(i, gInvaders[i].X, gInvaders[i].Y);
         if ((i + 1) % 3 === 0 ) {
             y += 70;
             x = 20;
@@ -108,8 +110,17 @@ function gameDraw() {
     gCanvas.fillRect(0, 0, 320, 480);
 
     for (var i = 0; i < gInvaders.length; i++) {
-        gCanvas.fillStyle = "yellow";
-        gCanvas.fillRect(gInvaders[i].X, gInvaders[i].Y, 50, 50);
+        if (shot === true) {
+            if (gInvaders[i].X <= gBullet.X && gInvaders[i].X + 50 > gBullet.X + gBullet.Width) {
+                if (gInvaders[i].Y <= gBullet.Y && gInvaders[i].Y + 50 > gBullet.Y + gBullet.Height) {
+                    invadersAlive[i] = false;
+                }
+            }
+        }
+        if (invadersAlive[i] === true) {
+            gCanvas.fillStyle = "yellow";
+            gCanvas.fillRect(gInvaders[i].X, gInvaders[i].Y, 50, 50);
+        }
     }
 
     if (rightDown === true) {
@@ -152,4 +163,8 @@ function gameDraw() {
         shot = true;
         spaceDown = false;
     }
+}
+
+function checkAlive() {
+    return true;
 }
