@@ -109,6 +109,12 @@ function gameDraw() {
     gCanvas.fillStyle = "black";
     gCanvas.fillRect(0, 0, 320, 480);
 
+    drawInvaders();
+    moveBoard();
+    drawBullet();
+}
+
+function drawInvaders() {
     for (var i = 0; i < gInvaders.length; i++) {
         if (shot === true && invadersAlive[i] === true) {
             if (gInvaders[i].X <= gBullet.X && gInvaders[i].X + 50 >= gBullet.X + gBullet.Width) {
@@ -118,14 +124,15 @@ function gameDraw() {
                 }
             }
         }
-        
+
         if (invadersAlive[i] === true) {
             gCanvas.fillStyle = "yellow";
             gCanvas.fillRect(gInvaders[i].X, gInvaders[i].Y, 50, 50);
         }
     }
-    
+}
 
+function moveBoard() {
     if (rightDown === true) {
         gShip.X += 20;
         rightDown = false;
@@ -145,7 +152,9 @@ function gameDraw() {
 
     gCanvas.fillStyle = "purple";
     gCanvas.fillRect(gShip.X, gShip.Y, gShip.Width, gShip.Height);
+}
 
+function drawBullet() {
     if (shot === true) {
         gCanvas.fillStyle = "green";
         gBullet.Y -= 15;
