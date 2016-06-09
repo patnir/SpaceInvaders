@@ -110,18 +110,21 @@ function gameDraw() {
     gCanvas.fillRect(0, 0, 320, 480);
 
     for (var i = 0; i < gInvaders.length; i++) {
-        if (shot === true) {
-            if (gInvaders[i].X <= gBullet.X && gInvaders[i].X + 50 > gBullet.X + gBullet.Width) {
-                if (gInvaders[i].Y <= gBullet.Y && gInvaders[i].Y + 50 > gBullet.Y + gBullet.Height) {
+        if (shot === true && invadersAlive[i] === true) {
+            if (gInvaders[i].X <= gBullet.X && gInvaders[i].X + 50 >= gBullet.X + gBullet.Width) {
+                if (gInvaders[i].Y <= gBullet.Y && gInvaders[i].Y + 50 >= gBullet.Y + gBullet.Height) {
+                    gBullet.Y = -100;
                     invadersAlive[i] = false;
                 }
             }
         }
+        
         if (invadersAlive[i] === true) {
             gCanvas.fillStyle = "yellow";
             gCanvas.fillRect(gInvaders[i].X, gInvaders[i].Y, 50, 50);
         }
     }
+    
 
     if (rightDown === true) {
         gShip.X += 20;
