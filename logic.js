@@ -4,9 +4,10 @@ var gInvaders;
 var gIsGamePaused;
 var gShip;
 var gBullet;
-var gSpaceDownKeyboard;
 var gIsInvadersAlive;
-var gCanFire;
+var gFired;
+
+var gIsGameOver;
 var gBulletExists;
 var gIsMouseDown;
 
@@ -26,26 +27,32 @@ function body_load() {
 function gameInit() {
     gCounter = 0;
     gCanFire = true;
+    gIsGameOver = false;
+    gBulletExists = false;
+    gFired = false;
     gIsMouseDown = false;
     gIsGamePaused = false;
     gInvaders = [];
     gIsInvadersAlive = [];
 
-    totalInvaders = 16
+    totalInvaders = 9
+    totalBullets = 3
 
-    x = 40;
-    y = 30;
+    invaderPositionX = 40;
+    invaderPositionY = 30;
 
     for (var i = 0; i < totalInvaders; i++) {
         gIsInvadersAlive[i] = true;
         gInvaders[i] = new Object();
-        gInvaders[i].X = x;
-        gInvaders[i].Y = y;
-        if ((i + 1) % 4 === 0) {
-            y += 70;
-            x = 40;
+        gInvaders[i].X = invaderPositionX;
+        gInvaders[i].Y = invaderPositionY;
+        gInvaders[i].Height = 50;
+        gInvaders[i].Width = 50;
+        if ((i + 1) % 3 === 0) {
+            invaderPositionY += 70;
+            invaderPositionX = 40;
         } else {
-            x = x + 100;
+            invaderPositionX += 125;
         }
     }
     gShip = new Object();
@@ -60,7 +67,7 @@ function gameInit() {
 }
 
 function gameLoop() {
-    if (gIsGamePaused != true) {
+    if (gIsGamePaused === false && gIsGameOver === false) {
         gameUpdateInvadersPosition();
         gameDraw();
         drawBullet();
@@ -108,9 +115,8 @@ function game_keydown(event) {
                 break;
 
             case 32:
-                if (gBulletExists != true) {
-                    gSpaceDownKeyboard = true;
-                    gBulletExists = true;
+                if (gBulletExists ===false) {
+                    gFired = true;
                 }
                 break;
         }
@@ -121,7 +127,7 @@ function gameUpdateInvadersPosition() {
     if (gCounter > 15) {
         gCounter = 0;
         for (var i = 0; i < gInvaders.length; i++) {
-            gInvaders[i].Y += 5;
+            gInvaders[i].Y += 15;
         }
     }
     gCounter++;
@@ -186,38 +192,58 @@ function game_onclick(event) {
     // Shoot bullet with click
     if (event.clientX >= 0 && event.clientX <= 440) {
         if (event.clientY >= 0 && event.clientY <= 900) {
-            if (gBulletExists != true) {
-                gSpaceDownKeyboard = true;
-                gBulletExists = true;
+            if (gBulletExists === false) {
+                gFired = true;
             }
         }
     }
 }
 
 function drawInvaders() {
+    var numberDrawn = 0;
     for (var i = 0; i < gInvaders.length; i++) {
         if (gBulletExists === true && gIsInvadersAlive[i] === true) {
             if (gInvaders[i].X <= gBullet.X
-                && gInvaders[i].X + 50 >= gBullet.X + gBullet.Width
+                && gInvaders[i].X + gInvaders[i].Height >= gBullet.X + gBullet.Width
                 && gInvaders[i].Y <= gBullet.Y 
-                && gInvaders[i].Y + 50 >= gBullet.Y + gBullet.Height) {
+                && gInvaders[i].Y + gInvaders[i].Height >= gBullet.Y + gBullet.Height) {
                 gBullet.Y = -100;
                 gIsInvadersAlive[i] = false;
             }
         }
 
-        if (gIsInvadersAlive[i] === true) {
+        if (gIsInvadersAlive[i] === true && gIsGameOver === false) {
+            if (gInvaders[i].Y + gInvaders[i].Height > 960) {
+                gIsGameOver = true;
+                displayGameOver();
+                return;
+            }
             gCanvas.fillStyle = "yellow";
-            gCanvas.fillRect(gInvaders[i].X, gInvaders[i].Y, 50, 50);
+            gCanvas.fillRect(gInvaders[i].X, gInvaders[i].Y, gInvaders[i].Width, gInvaders[i].Height);
+            numberDrawn += 1;
         }
+    }
+    if (numberDrawn == 0) {
+        gIsGameOver = true;
+        displayWinner();
     }
 }
 
+function displayWinner() {
+    alert("Invaders defeated!");
+}
+
+function displayGameOver() {
+    alert("GameOver!");
+}
+
 function moveBoard(event) {
+    // if the ship goes out on the left side
     if (gShip.X <= -140) {
         gShip.X = 300;
     }
 
+    // if the ship goes out on the right side
     if (gShip.X >= 440) {
         gShip.X = 0;
     }
@@ -227,24 +253,22 @@ function moveBoard(event) {
 }
 
 function drawBullet() {
-    if (gBulletExists === true && gIsGamePaused != true) {
+    if (gBulletExists === true) {
         gCanvas.fillStyle = "green";
         gBullet.Y -= 15;
         gCanvas.fillRect(gBullet.X, gBullet.Y, gBullet.Width, gBullet.Height);
     }
 
-    if (gBullet.Y < -20 && gIsGamePaused != true) {
-        gCanFire = true;
+    if (gBullet.Y < -20) {
         gBulletExists = false;
     }
 
-    if (gSpaceDownKeyboard === true && gCanFire === true && gIsGamePaused != true) {
+    if (gFired === true && gBulletExists === false) {
         gCanvas.fillStyle = "green";
         gBullet.X = gShip.X + gShip.Width / 2;
         gBullet.Y = gShip.Y - gBullet.Height;
         gCanvas.fillRect(gBullet.X, gBullet.Y, gBullet.Width, gBullet.Height);
-        gCanFire = false;
+        gFired = false;
         gBulletExists = true;
-        gSpaceDownKeyboard = false;
     }
 }
