@@ -35,10 +35,10 @@ function gameInit() {
     gInvaders = [];
     gIsInvadersAlive = [];
 
-    totalInvaders = 9
-    totalBullets = 3
+    totalInvaders = 3;
+    totalBullets = 3;
 
-    invaderPositionX = 40;
+    invaderPositionX = 60;
     invaderPositionY = 30;
 
     for (var i = 0; i < totalInvaders; i++) {
@@ -50,7 +50,7 @@ function gameInit() {
         gInvaders[i].Width = 50;
         if ((i + 1) % 3 === 0) {
             invaderPositionY += 70;
-            invaderPositionX = 40;
+            invaderPositionX = 60;
         } else {
             invaderPositionX += 125;
         }
@@ -68,8 +68,8 @@ function gameInit() {
 
 function gameLoop() {
     if (gIsGamePaused === false && gIsGameOver === false) {
+        drawGamePanel();
         gameUpdateInvadersPosition();
-        gameDraw();
         drawBullet();
         drawInvaders();
         moveBoard();
@@ -133,7 +133,7 @@ function gameUpdateInvadersPosition() {
     gCounter++;
 }
 
-function gameDraw() {
+function drawGamePanel() {
     gCanvas.fillStyle = "black";
     gCanvas.fillRect(0, 0, 540, 960);
 }
@@ -144,18 +144,14 @@ function drawButtonPanel() {
 }
 
 function drawButtons() {
+    gCanvas.fillStyle = "black";
+    gCanvas.fillRect(450, 10, 80, 40);
+    gCanvas.fillStyle = "white";
+    gCanvas.font = "20px Microsoft Sans Serif"
     if (gIsGamePaused == false) {
-        gCanvas.fillStyle = "black";
-        gCanvas.fillRect(450, 10, 80, 40);
-        gCanvas.fillStyle = "white";
-        gCanvas.font = "20px Microsoft Sans Serif"
         gCanvas.fillText("Pause", 460, 37)
     }
     else {
-        gCanvas.fillStyle = "black";
-        gCanvas.fillRect(450, 10, 80, 40);
-        gCanvas.fillStyle = "white";
-        gCanvas.font = "20px Microsoft Sans Serif"
         gCanvas.fillText("Resume", 452, 37)
     }
 
@@ -230,11 +226,17 @@ function drawInvaders() {
 }
 
 function displayWinner() {
-    alert("Invaders defeated!");
+    drawGamePanel();
+    gCanvas.fillStyle = "white";
+    gCanvas.font = "40px Microsoft Sans Serif"
+    gCanvas.fillText("Invaders Defeated", 40, 400)
 }
 
 function displayGameOver() {
-    alert("GameOver!");
+    drawGamePanel();
+    gCanvas.fillStyle = "white";
+    gCanvas.font = "60px Microsoft Sans Serif"
+    gCanvas.fillText("Game Over", 60, 400)
 }
 
 function moveBoard(event) {
