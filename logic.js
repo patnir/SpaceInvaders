@@ -169,6 +169,13 @@ function game_onclick(event) {
             }
         }
     }
+
+    if (event.clientX >= 0
+        && event.clientX <= 440
+        && event.clientY >= 0
+        && event.clientY <= 960) {
+        gShip.X = event.clientX - 70;
+    }
 }
 
 function drawInvaders() {
@@ -189,12 +196,12 @@ function drawInvaders() {
     }
 }
 
-function moveBoard() {
+function moveBoard(event) {
     if (rightDown === true && gamePaused != true) {
         gShip.X += 20;
         rightDown = false;
     }
-    if (leftDown === true && gamePaused != true) {
+    else if (leftDown === true && gamePaused != true) {
         gShip.X -= 20;
         leftDown = false
     }
