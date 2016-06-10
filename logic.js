@@ -1,19 +1,21 @@
 var gCanvas;
 var gCounter;
 var gInvaders;
-var gamePaused;
+var gIsGamePaused;
 var gShip;
 var gBullet;
-var spaceDown;
-var rightDown;
-var leftDown;
-var invadersAlive;
-var spaceDown;
-var canFire;
-var shot;
+var gSpaceDownKeyboard;
+var gRightDownKeyboard;
+var gLeftDownKeyboard;
+var gIsInvadersAlive;
+var gSpaceDownKeyboard;
+var gCanFire;
+var gBulletExists;
 
 function body_load() {
     canGame.onclick = game_onclick;
+    window.onmousedown = game_onmousedown;
+    window.onkeydown = game_keydown;
     gCanvas = canGame.getContext("2d");
 
     gameInit();
@@ -23,10 +25,10 @@ function body_load() {
 
 function gameInit() {
     gCounter = 0;
-    canFire = true;
-    gamePaused = false;
+    gCanFire = true;
+    gIsGamePaused = false;
     gInvaders = [];
-    invadersAlive = [];
+    gIsInvadersAlive = [];
 
     totalInvaders = 16
 
@@ -34,11 +36,11 @@ function gameInit() {
     y = 10;
 
     for (var i = 0; i < totalInvaders; i++) {
-        invadersAlive[i] = true;
+        gIsInvadersAlive[i] = true;
         gInvaders[i] = new Object();
         gInvaders[i].X = x;
         gInvaders[i].Y = y;
-        if ((i + 1) % 4 === 0 ) {
+        if ((i + 1) % 4 === 0) {
             y += 70;
             x = 20;
         } else {
@@ -58,7 +60,7 @@ function gameInit() {
 
 function gameLoop() {
     console.log(gShip.X)
-    if (gamePaused != true) {
+    if (gIsGamePaused != true) {
         gameUpdateInvadersPosition();
         gameDraw();
         drawBullet();
@@ -69,32 +71,46 @@ function gameLoop() {
     drawButtons();
 }
 
-window.addEventListener('keydown', function (event) {
-    if (gamePaused === false) {
+function game_onmousedown(event) {
+    if ()
+}
+
+function game_keydown(event) {
+    if (gIsGamePaused === false) {
         switch (event.keyCode) {
             case 37:
-                rightDown = false;
-                leftDown = true;
+                gRightDownKeyboard = false;
+                gLeftDownKeyboard = true;
                 break;
 
             case 39:
-                rightDown = true;
-                leftDown = false;
+                gRightDownKeyboard = true;
+                gLeftDownKeyboard = false;
                 break;
 
             case 32:
-                if (shot != true) {
-                    spaceDown = true;
-                    shot = true;
+                if (gBulletExists != true) {
+                    gSpaceDownKeyboard = true;
+                    gBulletExists = true;
                 }
                 break;
         }
     }
-}, false);
-
-function canGame_onclick(event) {
-    gShip.X = event.clientX;
 }
+
+//window.addEventListener('mousem', function (event) {
+//    if (event.clientX >= 0
+//    && event.clientX <= 440
+//    && event.clientY >= 0
+//    && event.clientY <= 960) {
+//        gShip.X = event.clientX - 70;
+//    }
+//    console.log(event.clientX);
+//}, false);
+
+//function canGame_onclick(event) {
+//    gShip.X = event.clientX;
+//}
 
 function gameUpdateInvadersPosition() {
     if (gCounter > 15) {
@@ -117,7 +133,7 @@ function drawButtonPanel() {
 }
 
 function drawButtons() {
-    if (gamePaused == false) {
+    if (gIsGamePaused == false) {
         gCanvas.fillStyle = "black";
         gCanvas.fillRect(450, 10, 80, 40);
         gCanvas.fillStyle = "white";
@@ -140,15 +156,14 @@ function drawButtons() {
 }
 
 function game_onclick(event) {
-    // Pause game
     if (event.clientX >= 450 && event.clientX <= 540) {
         if (event.clientY >= 10 && event.clientY <= 50) {
-            if (gamePaused === true) {
-                gamePaused = false;
+            if (gIsGamePaused === true) {
+                gIsGamePaused = false;
                 return;
             }
             else {
-                gamePaused = true;
+                gIsGamePaused = true;
                 return;
             }
         }
@@ -163,33 +178,26 @@ function game_onclick(event) {
 
     if (event.clientX >= 0 && event.clientX <= 440) {
         if (event.clientY >= 0 && event.clientY <= 960) {
-            if (shot != true) {
-                spaceDown = true;
-                shot = true;
+            if (gBulletExists != true) {
+                gSpaceDownKeyboard = true;
+                gBulletExists = true;
             }
         }
-    }
-
-    if (event.clientX >= 0
-        && event.clientX <= 440
-        && event.clientY >= 0
-        && event.clientY <= 960) {
-        gShip.X = event.clientX - 70;
     }
 }
 
 function drawInvaders() {
     for (var i = 0; i < gInvaders.length; i++) {
-        if (shot === true && invadersAlive[i] === true) {
+        if (gBulletExists === true && gIsInvadersAlive[i] === true) {
             if (gInvaders[i].X <= gBullet.X && gInvaders[i].X + 50 >= gBullet.X + gBullet.Width) {
                 if (gInvaders[i].Y <= gBullet.Y && gInvaders[i].Y + 50 >= gBullet.Y + gBullet.Height) {
                     gBullet.Y = -100;
-                    invadersAlive[i] = false;
+                    gIsInvadersAlive[i] = false;
                 }
             }
         }
 
-        if (invadersAlive[i] === true) {
+        if (gIsInvadersAlive[i] === true) {
             gCanvas.fillStyle = "yellow";
             gCanvas.fillRect(gInvaders[i].X, gInvaders[i].Y, 50, 50);
         }
@@ -197,46 +205,46 @@ function drawInvaders() {
 }
 
 function moveBoard(event) {
-    if (rightDown === true && gamePaused != true) {
+    if (gRightDownKeyboard === true && gIsGamePaused != true) {
         gShip.X += 20;
-        rightDown = false;
+        gRightDownKeyboard = false;
     }
-    else if (leftDown === true && gamePaused != true) {
+    else if (gLeftDownKeyboard === true && gIsGamePaused != true) {
         gShip.X -= 20;
-        leftDown = false
+        gLeftDownKeyboard = false
     }
 
-    //if (gShip.X <= -100) {
-    //    gShip.X = 220;
-    //}
+    if (gShip.X <= -140) {
+        gShip.X = 300;
+    }
 
-    //if (gShip.X >= 320) {
-    //    gShip.X = 0;
-    //}
+    if (gShip.X >= 440) {
+        gShip.X = 0;
+    }
 
     gCanvas.fillStyle = "purple";
     gCanvas.fillRect(gShip.X, gShip.Y, gShip.Width, gShip.Height);
 }
 
 function drawBullet() {
-    if (shot === true && gamePaused != true) {
+    if (gBulletExists === true && gIsGamePaused != true) {
         gCanvas.fillStyle = "green";
         gBullet.Y -= 15;
         gCanvas.fillRect(gBullet.X, gBullet.Y, gBullet.Width, gBullet.Height);
     }
 
-    if (gBullet.Y < -20 && gamePaused != true) {
-        canFire = true;
-        shot = false;
+    if (gBullet.Y < -20 && gIsGamePaused != true) {
+        gCanFire = true;
+        gBulletExists = false;
     }
 
-    if (spaceDown === true && canFire === true && gamePaused != true) {
+    if (gSpaceDownKeyboard === true && gCanFire === true && gIsGamePaused != true) {
         gCanvas.fillStyle = "green";
         gBullet.X = gShip.X + gShip.Width / 2;
         gBullet.Y = gShip.Y - gBullet.Height;
         gCanvas.fillRect(gBullet.X, gBullet.Y, gBullet.Width, gBullet.Height);
-        canFire = false;
-        shot = true;
-        spaceDown = false;
+        gCanFire = false;
+        gBulletExists = true;
+        gSpaceDownKeyboard = false;
     }
 }
