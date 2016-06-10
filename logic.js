@@ -5,10 +5,7 @@ var gIsGamePaused;
 var gShip;
 var gBullet;
 var gSpaceDownKeyboard;
-var gRightDownKeyboard;
-var gLeftDownKeyboard;
 var gIsInvadersAlive;
-var gSpaceDownKeyboard;
 var gCanFire;
 var gBulletExists;
 var gIsMouseDown;
@@ -36,8 +33,8 @@ function gameInit() {
 
     totalInvaders = 16
 
-    x = 20;
-    y = 10;
+    x = 40;
+    y = 30;
 
     for (var i = 0; i < totalInvaders; i++) {
         gIsInvadersAlive[i] = true;
@@ -46,7 +43,7 @@ function gameInit() {
         gInvaders[i].Y = y;
         if ((i + 1) % 4 === 0) {
             y += 70;
-            x = 20;
+            x = 40;
         } else {
             x = x + 100;
         }
@@ -63,15 +60,14 @@ function gameInit() {
 }
 
 function gameLoop() {
-    console.log(gShip.X)
     if (gIsGamePaused != true) {
         gameUpdateInvadersPosition();
         gameDraw();
         drawBullet();
         drawInvaders();
         moveBoard();
-        drawButtonPanel();
     }
+    drawButtonPanel();
     drawButtons();
 }
 
@@ -85,9 +81,6 @@ function game_onmousedown(event) {
         && event.clientY >= 0
         && event.clientY <= 960) {
         gIsMouseDown = true;
-    }
-    else {
-        gIsMouseDown = false;
     }
 }
 
@@ -107,13 +100,11 @@ function game_keydown(event) {
     if (gIsGamePaused === false) {
         switch (event.keyCode) {
             case 37:
-                gRightDownKeyboard = false;
-                gLeftDownKeyboard = true;
+                gShip.X -= 20;
                 break;
 
             case 39:
-                gRightDownKeyboard = true;
-                gLeftDownKeyboard = false;
+                gShip.X += 20;
                 break;
 
             case 32:
@@ -125,20 +116,6 @@ function game_keydown(event) {
         }
     }
 }
-
-//window.addEventListener('mousem', function (event) {
-//    if (event.clientX >= 0
-//    && event.clientX <= 440
-//    && event.clientY >= 0
-//    && event.clientY <= 960) {
-//        gShip.X = event.clientX - 70;
-//    }
-//    console.log(event.clientX);
-//}, false);
-
-//function canGame_onclick(event) {
-//    gShip.X = event.clientX;
-//}
 
 function gameUpdateInvadersPosition() {
     if (gCounter > 15) {
@@ -184,6 +161,7 @@ function drawButtons() {
 }
 
 function game_onclick(event) {
+    // Pause Game
     if (event.clientX >= 450 && event.clientX <= 540) {
         if (event.clientY >= 10 && event.clientY <= 50) {
             if (gIsGamePaused === true) {
@@ -197,6 +175,7 @@ function game_onclick(event) {
         }
     }
 
+    // Restart Game
     if (event.clientX >= 450 && event.clientX <= 540) {
         if (event.clientY >= 60 && event.clientY <= 100) {
             gameInit();
@@ -204,6 +183,7 @@ function game_onclick(event) {
         }
     }
 
+    // Shoot bullet with click
     if (event.clientX >= 0 && event.clientX <= 440) {
         if (event.clientY >= 0 && event.clientY <= 900) {
             if (gBulletExists != true) {
@@ -217,11 +197,12 @@ function game_onclick(event) {
 function drawInvaders() {
     for (var i = 0; i < gInvaders.length; i++) {
         if (gBulletExists === true && gIsInvadersAlive[i] === true) {
-            if (gInvaders[i].X <= gBullet.X && gInvaders[i].X + 50 >= gBullet.X + gBullet.Width) {
-                if (gInvaders[i].Y <= gBullet.Y && gInvaders[i].Y + 50 >= gBullet.Y + gBullet.Height) {
-                    gBullet.Y = -100;
-                    gIsInvadersAlive[i] = false;
-                }
+            if (gInvaders[i].X <= gBullet.X
+                && gInvaders[i].X + 50 >= gBullet.X + gBullet.Width
+                && gInvaders[i].Y <= gBullet.Y 
+                && gInvaders[i].Y + 50 >= gBullet.Y + gBullet.Height) {
+                gBullet.Y = -100;
+                gIsInvadersAlive[i] = false;
             }
         }
 
@@ -233,15 +214,6 @@ function drawInvaders() {
 }
 
 function moveBoard(event) {
-    if (gRightDownKeyboard === true && gIsGamePaused != true) {
-        gShip.X += 20;
-        gRightDownKeyboard = false;
-    }
-    else if (gLeftDownKeyboard === true && gIsGamePaused != true) {
-        gShip.X -= 20;
-        gLeftDownKeyboard = false
-    }
-
     if (gShip.X <= -140) {
         gShip.X = 300;
     }
