@@ -1,8 +1,7 @@
-// Global variables.
 var gCanvas;
 var gCounter;
 var gInvaders;
-var gamePaused = false;
+var gamePaused;
 var gShip;
 var gBullet;
 var spaceDown;
@@ -10,7 +9,7 @@ var rightDown;
 var leftDown;
 var invadersAlive;
 var spaceDown;
-var canFire = true;
+var canFire;
 var shot;
 
 function body_load() {
@@ -24,7 +23,8 @@ function body_load() {
 
 function gameInit() {
     gCounter = 0;
-
+    canFire = true;
+    gamePaused = false;
     gInvaders = [];
     invadersAlive = [];
 
@@ -65,8 +65,8 @@ function gameLoop() {
         moveBoard();
         drawBullet();
         drawButtonPanel();
-        drawButtons();
     }
+    drawButtons();
 }
 
 window.addEventListener('keydown', function (event) {
@@ -115,11 +115,20 @@ function drawButtonPanel() {
 }
 
 function drawButtons() {
-    gCanvas.fillStyle = "black";
-    gCanvas.fillRect(330, 10, 80, 40);
-    gCanvas.fillStyle = "white";
-    gCanvas.font = "20px Microsoft Sans Serif"
-    gCanvas.fillText("Pause", 340, 35)
+    if (gamePaused == false) {
+        gCanvas.fillStyle = "black";
+        gCanvas.fillRect(330, 10, 80, 40);
+        gCanvas.fillStyle = "white";
+        gCanvas.font = "20px Microsoft Sans Serif"
+        gCanvas.fillText("Pause", 340, 35)
+    }
+    else {
+        gCanvas.fillStyle = "black";
+        gCanvas.fillRect(330, 10, 80, 40);
+        gCanvas.fillStyle = "white";
+        gCanvas.font = "20px Microsoft Sans Serif"
+        gCanvas.fillText("Resume", 335, 35)
+    }
 
     gCanvas.fillStyle = "black";
     gCanvas.fillRect(330, 60, 80, 40);
@@ -195,7 +204,7 @@ function moveBoard() {
 function drawBullet() {
     if (shot === true && gamePaused != true) {
         gCanvas.fillStyle = "green";
-        gBullet.Y -= 15;
+        gBullet.Y -= 5;
         gCanvas.fillRect(gBullet.X, gBullet.Y, gBullet.Width, gBullet.Height);
     }
 
