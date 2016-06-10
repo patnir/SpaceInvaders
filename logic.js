@@ -13,7 +13,7 @@ var canFire;
 var shot;
 
 function body_load() {
-    canGame.onclick = checkPaused_onclick;
+    canGame.onclick = game_onclick;
     gCanvas = canGame.getContext("2d");
 
     gameInit();
@@ -28,7 +28,7 @@ function gameInit() {
     gInvaders = [];
     invadersAlive = [];
 
-    totalInvaders = 9
+    totalInvaders = 16
 
     x = 20;
     y = 10;
@@ -38,7 +38,7 @@ function gameInit() {
         gInvaders[i] = new Object();
         gInvaders[i].X = x;
         gInvaders[i].Y = y;
-        if ((i + 1) % 3 === 0 ) {
+        if ((i + 1) % 4 === 0 ) {
             y += 70;
             x = 20;
         } else {
@@ -46,10 +46,10 @@ function gameInit() {
         }
     }
     gShip = new Object();
-    gShip.X = 110;
-    gShip.Y = 440;
-    gShip.Width = 100;
-    gShip.Height = 20;
+    gShip.X = 140;
+    gShip.Y = 900;
+    gShip.Width = 150;
+    gShip.Height = 30;
 
     gBullet = new Object();
     gBullet.Width = 5;
@@ -57,13 +57,13 @@ function gameInit() {
 }
 
 function gameLoop() {
+    console.log(gShip.X)
     if (gamePaused != true) {
-        gameUpdate();
+        gameUpdateInvadersPosition();
         gameDraw();
-        drawButtonPanel();
+        drawBullet();
         drawInvaders();
         moveBoard();
-        drawBullet();
         drawButtonPanel();
     }
     drawButtons();
@@ -83,8 +83,10 @@ window.addEventListener('keydown', function (event) {
                 break;
 
             case 32:
-                spaceDown = true;
-                shot = true;
+                if (shot != true) {
+                    spaceDown = true;
+                    shot = true;
+                }
                 break;
         }
     }
@@ -94,7 +96,7 @@ function canGame_onclick(event) {
     gShip.X = event.clientX;
 }
 
-function gameUpdate() {
+function gameUpdateInvadersPosition() {
     if (gCounter > 15) {
         gCounter = 0;
         for (var i = 0; i < gInvaders.length; i++) {
@@ -106,39 +108,40 @@ function gameUpdate() {
 
 function gameDraw() {
     gCanvas.fillStyle = "black";
-    gCanvas.fillRect(0, 0, 320, 480);
+    gCanvas.fillRect(0, 0, 540, 960);
 }
 
 function drawButtonPanel() {
     gCanvas.fillStyle = "white";
-    gCanvas.fillRect(320, 0, 100, 480);
+    gCanvas.fillRect(440, 0, 100, 960);
 }
 
 function drawButtons() {
     if (gamePaused == false) {
         gCanvas.fillStyle = "black";
-        gCanvas.fillRect(330, 10, 80, 40);
+        gCanvas.fillRect(450, 10, 80, 40);
         gCanvas.fillStyle = "white";
         gCanvas.font = "20px Microsoft Sans Serif"
-        gCanvas.fillText("Pause", 340, 35)
+        gCanvas.fillText("Pause", 460, 37)
     }
     else {
         gCanvas.fillStyle = "black";
-        gCanvas.fillRect(330, 10, 80, 40);
+        gCanvas.fillRect(450, 10, 80, 40);
         gCanvas.fillStyle = "white";
         gCanvas.font = "20px Microsoft Sans Serif"
-        gCanvas.fillText("Resume", 335, 35)
+        gCanvas.fillText("Resume", 452, 37)
     }
 
     gCanvas.fillStyle = "black";
-    gCanvas.fillRect(330, 60, 80, 40);
+    gCanvas.fillRect(450, 60, 80, 40);
     gCanvas.fillStyle = "white";
     gCanvas.font = "20px Microsoft Sans Serif"
-    gCanvas.fillText("Restart", 340, 85)
+    gCanvas.fillText("Restart", 457, 87)
 }
 
-function checkPaused_onclick(event) {
-    if (event.clientX >= 330 && event.clientX <= 420) {
+function game_onclick(event) {
+    // Pause game
+    if (event.clientX >= 450 && event.clientX <= 540) {
         if (event.clientY >= 10 && event.clientY <= 50) {
             if (gamePaused === true) {
                 gamePaused = false;
@@ -150,12 +153,19 @@ function checkPaused_onclick(event) {
             }
         }
     }
-    if (event.clientX >= 330 && event.clientX <= 420) {
+
+    if (event.clientX >= 450 && event.clientX <= 540) {
         if (event.clientY >= 60 && event.clientY <= 100) {
             gameInit();
-            if (gamePaused === true) {
-                gamePaused = false;
-                return;
+            return;
+        }
+    }
+
+    if (event.clientX >= 0 && event.clientX <= 440) {
+        if (event.clientY >= 0 && event.clientY <= 960) {
+            if (shot != true) {
+                spaceDown = true;
+                shot = true;
             }
         }
     }
@@ -189,13 +199,13 @@ function moveBoard() {
         leftDown = false
     }
 
-    if (gShip.X <= -100) {
-        gShip.X = 220;
-    }
+    //if (gShip.X <= -100) {
+    //    gShip.X = 220;
+    //}
 
-    if (gShip.X >= 320) {
-        gShip.X = 0;
-    }
+    //if (gShip.X >= 320) {
+    //    gShip.X = 0;
+    //}
 
     gCanvas.fillStyle = "purple";
     gCanvas.fillRect(gShip.X, gShip.Y, gShip.Width, gShip.Height);
@@ -204,7 +214,7 @@ function moveBoard() {
 function drawBullet() {
     if (shot === true && gamePaused != true) {
         gCanvas.fillStyle = "green";
-        gBullet.Y -= 5;
+        gBullet.Y -= 15;
         gCanvas.fillRect(gBullet.X, gBullet.Y, gBullet.Width, gBullet.Height);
     }
 
