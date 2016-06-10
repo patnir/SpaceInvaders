@@ -11,11 +11,14 @@ var gIsInvadersAlive;
 var gSpaceDownKeyboard;
 var gCanFire;
 var gBulletExists;
+var gIsMouseDown;
 
 function body_load() {
     canGame.onclick = game_onclick;
     window.onmousedown = game_onmousedown;
     window.onkeydown = game_keydown;
+    window.onmousemove = game_onmousemove;
+    window.onmouseup = game_onmouseup;
     gCanvas = canGame.getContext("2d");
 
     gameInit();
@@ -26,6 +29,7 @@ function body_load() {
 function gameInit() {
     gCounter = 0;
     gCanFire = true;
+    gIsMouseDown = false;
     gIsGamePaused = false;
     gInvaders = [];
     gIsInvadersAlive = [];
@@ -72,7 +76,31 @@ function gameLoop() {
 }
 
 function game_onmousedown(event) {
-    if ()
+    if (event.clientX >= gShip.X
+        && event.clientX <= gShip.X + gShip.Width
+        && event.clientY >= gShip.Y
+        && event.clientY <= gShip.Y + gShip.Height
+        && event.clientX >= 0
+        && event.clientX <= 440
+        && event.clientY >= 0
+        && event.clientY <= 960) {
+        gIsMouseDown = true;
+    }
+    else {
+        gIsMouseDown = false;
+    }
+}
+
+function game_onmouseup(event) {
+    if (gIsMouseDown === true) {
+        gIsMouseDown = false;
+    }
+}
+
+function game_onmousemove(event) {
+    if (gIsMouseDown === true) {
+        gShip.X = event.clientX - 70;
+    }
 }
 
 function game_keydown(event) {
@@ -177,7 +205,7 @@ function game_onclick(event) {
     }
 
     if (event.clientX >= 0 && event.clientX <= 440) {
-        if (event.clientY >= 0 && event.clientY <= 960) {
+        if (event.clientY >= 0 && event.clientY <= 900) {
             if (gBulletExists != true) {
                 gSpaceDownKeyboard = true;
                 gBulletExists = true;
