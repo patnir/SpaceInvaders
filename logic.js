@@ -26,8 +26,18 @@ function body_load() {
     setInterval(gameLoop, 15);
 }
 
+function ditStorageGet(key, dfltValue) {
+    var value = localStorage.getItem(key);
+    if (value == undefined) {
+        return dfltValue;
+    }
+    return value;
+}
+
+
 function gameInit() {
     gScore = 0;
+    gHighScore = ditStorageGet('zip', 0)
     gCounter = 0;
     gCanFire = true;
     gIsGameOver = false;
@@ -38,7 +48,7 @@ function gameInit() {
     gInvaders = [];
     gIsInvadersAlive = [];
 
-    totalInvaders = 3;
+    totalInvaders = 9;
     totalBullets = 3;
 
     invaderPositionX = 60;
@@ -80,6 +90,12 @@ function gameLoop() {
     drawButtonPanel();
     drawButtons();
     drawScores();
+    if (gIsGameOver === true) {
+        if (gScore == gHighScore) {
+            localStorage.zip = "" + gHighScore + "";
+            var userZip = localStorage.zip;
+        }
+    }
 }
 
 function game_onmousedown(event) {
