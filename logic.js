@@ -6,12 +6,14 @@ var gShip;
 var gBullet;
 var gIsInvadersAlive;
 var gFired;
-
+var gScore;
 var gIsGameOver;
 var gBulletExists;
 var gIsMouseDown;
+var gHighScore;
 
 function body_load() {
+    gHighScore = 0;
     canGame.onclick = game_onclick;
     window.onmousedown = game_onmousedown;
     window.onkeydown = game_keydown;
@@ -25,6 +27,7 @@ function body_load() {
 }
 
 function gameInit() {
+    gScore = 0;
     gCounter = 0;
     gCanFire = true;
     gIsGameOver = false;
@@ -76,6 +79,7 @@ function gameLoop() {
     }
     drawButtonPanel();
     drawButtons();
+    drawScores();
 }
 
 function game_onmousedown(event) {
@@ -162,6 +166,23 @@ function drawButtons() {
     gCanvas.fillText("Restart", 457, 87)
 }
 
+function drawScores() {
+    gCanvas.fillStyle = "black";
+    gCanvas.fillRect(450, 780, 80, 70);
+    gCanvas.fillStyle = "white";
+    gCanvas.font = "16px Microsoft Sans Serif"
+    gCanvas.fillText("Highscore", 455, 805)
+    gCanvas.font = "20px Microsoft Sans Serif"
+    gCanvas.fillText("  " + gHighScore, 457, 840)
+
+    gCanvas.fillStyle = "black";
+    gCanvas.fillRect(450, 870, 80, 70);
+    gCanvas.fillStyle = "white";
+    gCanvas.font = "20px Microsoft Sans Serif"
+    gCanvas.fillText("Score", 457, 900)
+    gCanvas.fillText("  " + gScore, 457, 930)
+}
+
 function game_onclick(event) {
     // Pause Game
     if (event.clientX >= 450 && event.clientX <= 540) {
@@ -205,6 +226,10 @@ function drawInvaders() {
                 && gInvaders[i].Y + gInvaders[i].Height >= gBullet.Y + gBullet.Height) {
                 gBullet.Y = -100;
                 gIsInvadersAlive[i] = false;
+                gScore += 50;
+                if (gScore >= gHighScore) {
+                    gHighScore = gScore;
+                }
             }
         }
 
