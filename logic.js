@@ -7,7 +7,7 @@ var gIsGameOver;
 
 var gCurrentLevel;
 
-var gIsMouseDown
+var gIsMouseDownOnShip
 
 var gShip;
 
@@ -21,7 +21,6 @@ var gHighScore;
 function body_load() {
     window.onkeydown = game_keydown;
 
-    canGame.onclick = game_onclick;
     canGame.onmousedown = game_onmousedown;
     canGame.onmousemove = game_onmousemove;
     canGame.onmouseup = game_onmouseup;
@@ -50,7 +49,7 @@ function gameInit() {
     gCounter = 0;
     gCanFire = true;
     gIsGameOver = false;
-    gIsMouseDown = false;
+    gIsMouseDownOnShip = false;
     gIsGamePaused = false;
     gInvaders = [];
     gBullets = [];
@@ -110,24 +109,65 @@ function gameLoop() {
 }
 
 function game_onmousedown(event) {
+
+    if (event.clientX >= 450
+        && event.clientX <= 540
+        && event.clientY >= 60
+        && event.clientY <= 100) {
+        gameInit();
+        return;
+    }
+
+    // Gamepaused logic
+
+    if (gIsGameOver === true || gIsGamePaused === true) {
+        return;
+    }
+
     if (event.clientX >= gShip.X
-        && event.clientX <= gShip.X + gShip.Width
-        && event.clientY >= gShip.Y
-        && event.clientY <= gShip.Y + gShip.Height
-        && event.clientX >= 0
+    && event.clientX <= gShip.X + gShip.Width
+    && event.clientY >= gShip.Y
+    && event.clientY <= gShip.Y + gShip.Height
+    && event.clientX >= 0
+    && event.clientX <= 440
+    && event.clientY >= 0
+    && event.clientY <= 960) {
+        gIsMouseDownOnShip = true;
+    }
+
+    if (event.clientX >= 450
+        && event.clientX <= 540
+        && event.clientY >= 10
+        && event.clientY <= 50) {
+        if (gIsGamePaused === true) {
+            gIsGamePaused = false;
+            return;
+        }
+        else {
+            gIsGamePaused = true;
+            return;
+        }
+    }
+
+    if (event.clientX >= 0
         && event.clientX <= 440
         && event.clientY >= 0
-        && event.clientY <= 960) {
-        gIsMouseDown = true;
+        && event.clientY <= 900) {
+        for (var i = 0; i < gBullets.length; i++) {
+            if (gBullets[i].OnScreen === false) {
+                gBullets[i].Fired = true;
+                break;
+            }
+        }
     }
 }
 
 function game_onmouseup(event) {
-    gIsMouseDown = false;
+    gIsMouseDownOnShip = false;
 }
 
 function game_onmousemove(event) {
-    if (gIsMouseDown === true) {
+    if (gIsMouseDownOnShip === true) {
         gShip.X = event.clientX - 70;
     }
 }
@@ -266,48 +306,6 @@ function drawScores() {
     gCanvas.font = "20px Microsoft Sans Serif"
     gCanvas.fillText("Score", 457, 900)
     gCanvas.fillText("  " + gScore, 457, 930)
-}
-
-function game_onclick(event) {
-    // Restart Game
-    if (event.clientX >= 450
-        && event.clientX <= 540
-        && event.clientY >= 60
-        && event.clientY <= 100) {
-        gameInit();
-        return;
-    }
-
-    // Gamepaused logic
-
-    // Pause Game
-    if (gIsGameOver === false
-        && event.clientX >= 450 
-        && event.clientX <= 540 
-        && event.clientY >= 10 
-        && event.clientY <= 50) {
-        if (gIsGamePaused === true) {
-            gIsGamePaused = false;
-            return;
-        }
-        else {
-            gIsGamePaused = true;
-            return;
-        }
-    }
-    // Shoot bullet with click
-    if (gIsGamePaused === false
-        && event.clientX >= 0
-        && event.clientX <= 440
-        && event.clientY >= 0
-        && event.clientY <= 900) {
-        for (var i = 0; i < gBullets.length; i++) {
-            if (gBullets[i].OnScreen === false) {
-                gBullets[i].Fired = true;
-                break;
-            }
-        }
-    }
 }
 
 function drawInvaders() {
