@@ -5,6 +5,10 @@ var gFrames;
 var gIsGamePaused;
 var gIsGameOver;
 
+var gCurrentLevel;
+
+var gIsMouseDown
+
 var gShip;
 
 var gBullets;
@@ -15,21 +19,18 @@ var gIsInvadersAlive;
 var gScore;
 var gHighScore;
 
-var gIsMouseDown;
-
-var gCurrentLevel;
-
-
 function body_load() {
-    gHighScore = 0;
-    gFrames = 15;
-    canGame.onclick = game_onclick;
-    window.onmousedown = game_onmousedown;
     window.onkeydown = game_keydown;
-    window.onmousemove = game_onmousemove;
-    window.onmouseup = game_onmouseup;
+
+    canGame.onclick = game_onclick;
+    canGame.onmousedown = game_onmousedown;
+    canGame.onmousemove = game_onmousemove;
+    canGame.onmouseup = game_onmouseup;
     gCanvas = canGame.getContext("2d");
+
+    gFrames = 15;
     gCurrentLevel = 1;
+
     gameInit();
 
     setInterval(gameLoop, 15);
@@ -97,7 +98,7 @@ function gameLoop() {
         gameUpdateInvadersPosition();
         drawBullets();
         drawInvaders();
-        moveBoard();
+        drawShip();
     }
     drawButtonPanel();
     drawButtons();
@@ -272,24 +273,27 @@ function drawScores() {
 
 function game_onclick(event) {
     // Pause Game
-    if (event.clientX >= 450 && event.clientX <= 540) {
-        if (event.clientY >= 10 && event.clientY <= 50) {
-            if (gIsGamePaused === true) {
-                gIsGamePaused = false;
-                return;
-            }
-            else {
-                gIsGamePaused = true;
-                return;
-            }
+    if (gIsGameOver === false
+        && event.clientX >= 450 
+        && event.clientX <= 540 
+        && event.clientY >= 10 
+        && event.clientY <= 50) {
+        if (gIsGamePaused === true) {
+            gIsGamePaused = false;
+            return;
+        }
+        else {
+            gIsGamePaused = true;
+            return;
         }
     }
     // Restart Game
-    if (event.clientX >= 450 && event.clientX <= 540) {
-        if (event.clientY >= 60 && event.clientY <= 100) {
-            gameInit();
-            return;
-        }
+    if (event.clientX >= 450 
+        && event.clientX <= 540 
+        && event.clientY >= 60 
+        && event.clientY <= 100) {
+        gameInit();
+        return; 
     }
     // Shoot bullet with click
     if (gIsGamePaused === false) {
@@ -357,21 +361,6 @@ function displayGameOver() {
     gCanvas.fillText("Game Over", 60, 400)
 }
 
-function moveBoard(event) {
-    // if the ship goes out on the left side
-    if (gShip.X <= -140) {
-        gShip.X = 300;
-    }
-
-    // if the ship goes out on the right side
-    if (gShip.X >= 440) {
-        gShip.X = 0;
-    }
-
-    gCanvas.fillStyle = "purple";
-    gCanvas.fillRect(gShip.X, gShip.Y, gShip.Width, gShip.Height);
-}
-
 function drawBullets() {
     for (var i = 0; i < gBullets.length; i++) {
         if (gBullets[i].OnScreen === true) {
@@ -389,8 +378,21 @@ function drawBullets() {
             gBullets[i].X = gShip.X + gShip.Width / 2;
             gBullets[i].Y = gShip.Y - gBullets[i].Height;
             gCanvas.fillRect(gBullets[i].X, gBullets[i].Y, gBullets[i].Width, gBullets[i].Height);
-            gBullets[i].Fired = false;
+            gBullets[i].Fired = false; 
             gBullets[i].OnScreen = true;
         }
     }
+}
+
+function drawShip(event) {
+    if (gShip.X <= -140) {
+        gShip.X = 300;
+    }
+
+    if (gShip.X >= 440) {
+        gShip.X = 0;
+    }
+
+    gCanvas.fillStyle = "purple";
+    gCanvas.fillRect(gShip.X, gShip.Y, gShip.Width, gShip.Height);
 }
