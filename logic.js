@@ -127,11 +127,7 @@ function game_onmousedown(event) {
     if (event.clientX >= gShip.X
     && event.clientX <= gShip.X + gShip.Width
     && event.clientY >= gShip.Y
-    && event.clientY <= gShip.Y + gShip.Height
-    && event.clientX >= 0
-    && event.clientX <= 440
-    && event.clientY >= 0
-    && event.clientY <= 960) {
+    && event.clientY <= gShip.Y + gShip.Height) {
         gIsMouseDownOnShip = true;
     }
 
