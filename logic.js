@@ -14,7 +14,6 @@ var gShip;
 var gBullets;
 
 var gInvaders;
-var gIsInvadersAlive;
 
 var gScore;
 var gHighScore;
@@ -54,7 +53,6 @@ function gameInit() {
     gIsMouseDown = false;
     gIsGamePaused = false;
     gInvaders = [];
-    gIsInvadersAlive = [];
     gBullets = [];
 
     totalInvaders = 9;
@@ -64,12 +62,12 @@ function gameInit() {
     invaderPositionY = 30;
 
     for (var i = 0; i < totalInvaders; i++) {
-        gIsInvadersAlive[i] = true;
         gInvaders[i] = new Object();
         gInvaders[i].X = invaderPositionX;
         gInvaders[i].Y = invaderPositionY;
         gInvaders[i].Height = 50;
         gInvaders[i].Width = 50;
+        gInvaders[i].IsAlive = true;
         if ((i + 1) % 3 === 0) {
             invaderPositionY += 70;
             invaderPositionX = 60;
@@ -125,9 +123,7 @@ function game_onmousedown(event) {
 }
 
 function game_onmouseup(event) {
-    if (gIsMouseDown === true) {
-        gIsMouseDown = false;
-    }
+    gIsMouseDown = false;
 }
 
 function game_onmousemove(event) {
@@ -137,25 +133,26 @@ function game_onmousemove(event) {
 }
 
 function game_keydown(event) {
-    if (gIsGamePaused === false) {
-        switch (event.keyCode) {
-            case 37:
-                gShip.X -= 20;
-                break;
+    if (gIsGamePaused === true) {
+        return;
+    }
+    switch (event.keyCode) {
+        case 37:
+            gShip.X -= 20;
+            break;
 
-            case 39:
-                gShip.X += 20;
-                break;
+        case 39:
+            gShip.X += 20;
+            break;
 
-            case 32:
-                for (var i = 0; i < gBullets.length; i++) {
-                    if (gBullets[i].OnScreen === false) {
-                        gBullets[i].Fired = true;
-                        break;
-                    }
+        case 32:
+            for (var i = 0; i < gBullets.length; i++) {
+                if (gBullets[i].OnScreen === false) {
+                    gBullets[i].Fired = true;
+                    break;
                 }
-                break;
-        }
+            }
+            break;
     }
 }
 
@@ -250,7 +247,7 @@ function drawButtons() {
     gCanvas.fillRect(450, 360, 80, 40);
     gCanvas.fillStyle = "white";
     gCanvas.font = "20px Microsoft Sans Serif"
-    gCanvas.fillText("Level 5", 457, 387)
+    gCanvas.fillText("Level 5", 457, 387);
 
 }
 
@@ -272,6 +269,17 @@ function drawScores() {
 }
 
 function game_onclick(event) {
+    // Restart Game
+    if (event.clientX >= 450
+        && event.clientX <= 540
+        && event.clientY >= 60
+        && event.clientY <= 100) {
+        gameInit();
+        return;
+    }
+
+    // Gamepaused logic
+
     // Pause Game
     if (gIsGameOver === false
         && event.clientX >= 450 
@@ -287,25 +295,16 @@ function game_onclick(event) {
             return;
         }
     }
-    // Restart Game
-    if (event.clientX >= 450 
-        && event.clientX <= 540 
-        && event.clientY >= 60 
-        && event.clientY <= 100) {
-        gameInit();
-        return; 
-    }
     // Shoot bullet with click
-    if (gIsGamePaused === false) {
-        if (event.clientX >= 0
-            && event.clientX <= 440
-            && event.clientY >= 0
-            && event.clientY <= 900) {
-            for (var i = 0; i < gBullets.length; i++) {
-                if (gBullets[i].OnScreen === false) {
-                    gBullets[i].Fired = true;
-                    break;
-                }
+    if (gIsGamePaused === false
+        && event.clientX >= 0
+        && event.clientX <= 440
+        && event.clientY >= 0
+        && event.clientY <= 900) {
+        for (var i = 0; i < gBullets.length; i++) {
+            if (gBullets[i].OnScreen === false) {
+                gBullets[i].Fired = true;
+                break;
             }
         }
     }
@@ -315,22 +314,24 @@ function drawInvaders() {
     var numberDrawn = 0;
     for (var i = 0; i < gInvaders.length; i++) {
         for (var j = 0; j < gBullets.length; j++) {
-            if (gBullets[j].OnScreen === true && gIsInvadersAlive[i] === true) {
-                if (gInvaders[i].X <= gBullets[j].X
-                    && gInvaders[i].X + gInvaders[i].Height >= gBullets[j].X + gBullets[j].Width
-                    && gInvaders[i].Y <= gBullets[j].Y
-                    && gInvaders[i].Y + gInvaders[i].Height >= gBullets[j].Y + gBullets[j].Height) {
-                    gBullets[j].Y = -100;
-                    gIsInvadersAlive[i] = false;
-                    gScore += 50;
-                    if (gScore >= gHighScore) {
-                        gHighScore = gScore;
-                    }
+            if (gBullets[j].OnScreen === true
+                && gInvaders[i].IsAlive === true
+                && gInvaders[i].X <= gBullets[j].X
+                && gInvaders[i].X + gInvaders[i].Height >= gBullets[j].X + gBullets[j].Width
+                && gInvaders[i].Y <= gBullets[j].Y
+                && gInvaders[i].Y + gInvaders[i].Height >= gBullets[j].Y + gBullets[j].Height) {
+
+                gBullets[j].Y = -100;
+                gInvaders[i].IsAlive = false;
+                gScore += 50;
+
+                if (gScore >= gHighScore) {
+                    gHighScore = gScore;
                 }
             }
         }
 
-        if (gIsInvadersAlive[i] === true && gIsGameOver === false) {
+        if (gInvaders[i].IsAlive === true && gIsGameOver === false) {
             if (gInvaders[i].Y + gInvaders[i].Height > 960) {
                 gIsGameOver = true;
                 displayGameOver();
