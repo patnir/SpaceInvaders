@@ -102,15 +102,11 @@ function gameLoop() {
     drawButtonPanel();
     drawButtons();
     drawScores();
-    if (gIsGameOver === true) {
-        if (gScore == gHighScore) {
-            localStorage.zip = "" + gHighScore + "";
-            var userZip = localStorage.zip;
-        }
-    }
 }
 
 function game_onmousedown(event) {
+
+    // Restart game
 
     if (event.clientX >= 450
         && event.clientX <= 540
@@ -120,13 +116,7 @@ function game_onmousedown(event) {
         return;
     }
 
-
-    if (event.clientX >= gShip.X
-    && event.clientX <= gShip.X + gShip.Width
-    && event.clientY >= gShip.Y
-    && event.clientY <= gShip.Y + gShip.Height) {
-        gIsMouseDownOnShip = true;
-    }
+    // Pause game
 
     if (gIsGameOver === false
         && event.clientX >= 450
@@ -142,6 +132,18 @@ function game_onmousedown(event) {
             return;
         }
     }
+
+    // Move ship
+
+    if (gIsGamePaused === false
+        && event.clientX >= gShip.X
+        && event.clientX <= gShip.X + gShip.Width
+        && event.clientY >= gShip.Y
+        && event.clientY <= gShip.Y + gShip.Height) {
+        gIsMouseDownOnShip = true;
+    }
+
+    // Fire bullets
 
     if (gIsGamePaused === false
         && event.clientX >= 0
@@ -257,20 +259,6 @@ function drawInvaders() {
     }
 }
 
-function displayWinner() {
-    drawGamePanel();
-    gCanvas.fillStyle = "white";
-    gCanvas.font = "40px Microsoft Sans Serif"
-    gCanvas.fillText("Invaders Defeated", 40, 400)
-}
-
-function displayGameOver() {
-    drawGamePanel();
-    gCanvas.fillStyle = "white";
-    gCanvas.font = "60px Microsoft Sans Serif"
-    gCanvas.fillText("Game Over", 60, 400)
-}
-
 function drawBullets() {
     for (var i = 0; i < gBullets.length; i++) {
         if (gBullets[i].OnScreen === true) {
@@ -305,6 +293,30 @@ function drawShip(event) {
 
     gCanvas.fillStyle = "purple";
     gCanvas.fillRect(gShip.X, gShip.Y, gShip.Width, gShip.Height);
+}
+
+function displayWinner() {
+    drawGamePanel();
+    gCanvas.fillStyle = "white";
+    gCanvas.font = "40px Microsoft Sans Serif"
+    gCanvas.fillText("Invaders Defeated", 40, 400)
+
+    if (gScore == gHighScore) {
+        localStorage.zip = "" + gHighScore + "";
+        var userZip = localStorage.zip;
+    }
+}
+
+function displayGameOver() {
+    drawGamePanel();
+    gCanvas.fillStyle = "white";
+    gCanvas.font = "60px Microsoft Sans Serif"
+    gCanvas.fillText("Game Over", 60, 400)
+
+    if (gScore == gHighScore) {
+        localStorage.zip = "" + gHighScore + "";
+        var userZip = localStorage.zip;
+    }
 }
 
 function drawGamePanel() {
