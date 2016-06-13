@@ -1,5 +1,6 @@
 var gCanvas;
 var gCounter;
+var gFrames;
 
 var gIsGamePaused;
 var gIsGameOver;
@@ -16,16 +17,19 @@ var gHighScore;
 
 var gIsMouseDown;
 
+var gCurrentLevel;
+
 
 function body_load() {
     gHighScore = 0;
+    gFrames = 15;
     canGame.onclick = game_onclick;
     window.onmousedown = game_onmousedown;
     window.onkeydown = game_keydown;
     window.onmousemove = game_onmousemove;
     window.onmouseup = game_onmouseup;
     gCanvas = canGame.getContext("2d");
-
+    gCurrentLevel = 1;
     gameInit();
 
     setInterval(gameLoop, 15);
@@ -155,7 +159,7 @@ function game_keydown(event) {
 }
 
 function gameUpdateInvadersPosition() {
-    if (gCounter > 15) {
+    if (gCounter > gFrames) {
         gCounter = 0;
         for (var i = 0; i < gInvaders.length; i++) {
             gInvaders[i].Y += 15;
@@ -191,6 +195,62 @@ function drawButtons() {
     gCanvas.fillStyle = "white";
     gCanvas.font = "20px Microsoft Sans Serif"
     gCanvas.fillText("Restart", 457, 87)
+
+    // Level 1
+    if (gCurrentLevel === 1) {
+        gCanvas.fillStyle = "red";
+    } else {
+        gCanvas.fillStyle = "black";
+    }
+    gCanvas.fillRect(450, 160, 80, 40);
+    gCanvas.fillStyle = "white";
+    gCanvas.font = "20px Microsoft Sans Serif"
+    gCanvas.fillText("Level 1", 457, 187)
+
+    // Level 2
+    if (gCurrentLevel === 2) {
+        gCanvas.fillStyle = "red";
+    } else {
+        gCanvas.fillStyle = "black";
+    }
+    gCanvas.fillRect(450, 210, 80, 40);
+    gCanvas.fillStyle = "white";
+    gCanvas.font = "20px Microsoft Sans Serif"
+    gCanvas.fillText("Level 2", 457, 237)
+
+    // Level 3
+    if (gCurrentLevel === 3) {
+        gCanvas.fillStyle = "red";
+    } else {
+        gCanvas.fillStyle = "black";
+    }
+    gCanvas.fillRect(450, 260, 80, 40);
+    gCanvas.fillStyle = "white";
+    gCanvas.font = "20px Microsoft Sans Serif"
+    gCanvas.fillText("Level 3", 457, 287)
+
+    // Level 4
+    if (gCurrentLevel === 4) {
+        gCanvas.fillStyle = "red";
+    } else {
+        gCanvas.fillStyle = "black";
+    }
+    gCanvas.fillRect(450, 310, 80, 40);
+    gCanvas.fillStyle = "white";
+    gCanvas.font = "20px Microsoft Sans Serif"
+    gCanvas.fillText("Level 4", 457, 337)
+
+    // Level 5
+    if (gCurrentLevel === 5) {
+        gCanvas.fillStyle = "red";
+    } else {
+        gCanvas.fillStyle = "black";
+    }
+    gCanvas.fillRect(450, 360, 80, 40);
+    gCanvas.fillStyle = "white";
+    gCanvas.font = "20px Microsoft Sans Serif"
+    gCanvas.fillText("Level 5", 457, 387)
+
 }
 
 function drawScores() {
@@ -316,7 +376,7 @@ function drawBullets() {
     for (var i = 0; i < gBullets.length; i++) {
         if (gBullets[i].OnScreen === true) {
             gCanvas.fillStyle = "green";
-            gBullets[i].Y -= 15;
+            gBullets[i].Y -= 10;
             gCanvas.fillRect(gBullets[i].X, gBullets[i].Y, gBullets[i].Width, gBullets[i].Height);
         }
 
