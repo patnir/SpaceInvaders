@@ -42,7 +42,6 @@ function ditStorageGet(key, dfltValue) {
     return value;
 }
 
-
 function gameInit() {
     gScore = 0;
     gHighScore = ditStorageGet('zip', 0)
@@ -74,6 +73,7 @@ function gameInit() {
             invaderPositionX += 125;
         }
     }
+
     gShip = new Object();
     gShip.X = 140;
     gShip.Y = 900;
@@ -93,6 +93,8 @@ function gameLoop() {
     if (gIsGamePaused === false && gIsGameOver === false) {
         drawGamePanel();
         gameUpdateInvadersPosition();
+        checkInvadersState();
+        checkGameState();
         drawBullets();
         drawInvaders();
         drawShip();
@@ -118,11 +120,6 @@ function game_onmousedown(event) {
         return;
     }
 
-    // Gamepaused logic
-
-    if (gIsGameOver === true || gIsGamePaused === true) {
-        return;
-    }
 
     if (event.clientX >= gShip.X
     && event.clientX <= gShip.X + gShip.Width
@@ -131,7 +128,8 @@ function game_onmousedown(event) {
         gIsMouseDownOnShip = true;
     }
 
-    if (event.clientX >= 450
+    if (gIsGameOver === false
+        && event.clientX >= 450
         && event.clientX <= 540
         && event.clientY >= 10
         && event.clientY <= 50) {
@@ -145,7 +143,8 @@ function game_onmousedown(event) {
         }
     }
 
-    if (event.clientX >= 0
+    if (gIsGamePaused === false
+        && event.clientX >= 0
         && event.clientX <= 440
         && event.clientY >= 0
         && event.clientY <= 900) {
@@ -200,6 +199,112 @@ function gameUpdateInvadersPosition() {
         }
     }
     gCounter++;
+}
+
+function checkGameState() {
+    var numberDrawn = 0;
+    for (var i = 0; i < gInvaders.length; i++) {
+        for (var j = 0; j < gBullets.length; j++) {
+            if (gInvaders[i].IsAlive === true && gIsGameOver === false) {
+                if (gInvaders[i].Y + gInvaders[i].Height > 960) {
+                    gIsGameOver = true;
+                    displayGameOver();
+                    return;
+                }
+                numberDrawn += 1;
+            }
+        }
+    }
+    if (numberDrawn == 0) {
+        gIsGameOver = true;
+        displayWinner();
+    }
+}
+
+function checkInvadersState() {
+    var numberDrawn = 0;
+    for (var i = 0; i < gInvaders.length; i++) {
+        for (var j = 0; j < gBullets.length; j++) {
+            if (gBullets[j].OnScreen === true
+                && gInvaders[i].IsAlive === true
+                && gInvaders[i].X <= gBullets[j].X
+                && gInvaders[i].X + gInvaders[i].Height >= gBullets[j].X + gBullets[j].Width
+                && gInvaders[i].Y <= gBullets[j].Y
+                && gInvaders[i].Y + gInvaders[i].Height >= gBullets[j].Y + gBullets[j].Height) {
+
+                gBullets[j].Y = -100;
+                gInvaders[i].IsAlive = false;
+                gScore += 50;
+
+                if (gScore >= gHighScore) {
+                    gHighScore = gScore;
+                }
+            }
+        }
+    }
+}
+
+function drawInvaders() {
+    if (gIsGamePaused === true) {
+        return;
+    }
+
+    for (var i = 0; i < gInvaders.length; i++) {
+        if (gInvaders[i].IsAlive === true) {
+            gCanvas.fillStyle = "yellow";
+            gCanvas.fillRect(gInvaders[i].X, gInvaders[i].Y, gInvaders[i].Width, gInvaders[i].Height);
+        }
+    }
+}
+
+function displayWinner() {
+    drawGamePanel();
+    gCanvas.fillStyle = "white";
+    gCanvas.font = "40px Microsoft Sans Serif"
+    gCanvas.fillText("Invaders Defeated", 40, 400)
+}
+
+function displayGameOver() {
+    drawGamePanel();
+    gCanvas.fillStyle = "white";
+    gCanvas.font = "60px Microsoft Sans Serif"
+    gCanvas.fillText("Game Over", 60, 400)
+}
+
+function drawBullets() {
+    for (var i = 0; i < gBullets.length; i++) {
+        if (gBullets[i].OnScreen === true) {
+            gCanvas.fillStyle = "green";
+            gBullets[i].Y -= 10;
+            gCanvas.fillRect(gBullets[i].X, gBullets[i].Y, gBullets[i].Width, gBullets[i].Height);
+        }
+
+        if (gBullets[i].Y < -20) {
+            gBullets[i].OnScreen = false;
+        }
+
+        if (gBullets[i].Fired === true && gBullets[i].OnScreen === false) {
+            gCanvas.fillStyle = "green";
+            gBullets[i].X = gShip.X + gShip.Width / 2;
+            gBullets[i].Y = gShip.Y - gBullets[i].Height;
+            gCanvas.fillRect(gBullets[i].X, gBullets[i].Y, gBullets[i].Width, gBullets[i].Height);
+            gBullets[i].Fired = false; 
+            gBullets[i].OnScreen = true;
+        }
+    }
+}
+
+function drawShip(event) {
+    if (gShip.X <= -140) {
+        gShip.X = 300;
+    }
+
+    if (gShip.X >= 440) {
+        gShip.X = 0;
+    }
+
+    gCanvas.fillStyle = "purple";
+    gCanvas.fillRect(gShip.X, gShip.Y, gShip.Width, gShip.Height);
 }
 
 function drawGamePanel() {
@@ -302,92 +407,4 @@ function drawScores() {
     gCanvas.font = "20px Microsoft Sans Serif"
     gCanvas.fillText("Score", 457, 900)
     gCanvas.fillText("  " + gScore, 457, 930)
-}
-
-function drawInvaders() {
-    var numberDrawn = 0;
-    for (var i = 0; i < gInvaders.length; i++) {
-        for (var j = 0; j < gBullets.length; j++) {
-            if (gBullets[j].OnScreen === true
-                && gInvaders[i].IsAlive === true
-                && gInvaders[i].X <= gBullets[j].X
-                && gInvaders[i].X + gInvaders[i].Height >= gBullets[j].X + gBullets[j].Width
-                && gInvaders[i].Y <= gBullets[j].Y
-                && gInvaders[i].Y + gInvaders[i].Height >= gBullets[j].Y + gBullets[j].Height) {
-
-                gBullets[j].Y = -100;
-                gInvaders[i].IsAlive = false;
-                gScore += 50;
-
-                if (gScore >= gHighScore) {
-                    gHighScore = gScore;
-                }
-            }
-        }
-
-        if (gInvaders[i].IsAlive === true && gIsGameOver === false) {
-            if (gInvaders[i].Y + gInvaders[i].Height > 960) {
-                gIsGameOver = true;
-                displayGameOver();
-                return;
-            }
-            gCanvas.fillStyle = "yellow";
-            gCanvas.fillRect(gInvaders[i].X, gInvaders[i].Y, gInvaders[i].Width, gInvaders[i].Height);
-            numberDrawn += 1;
-        }
-    }
-    if (numberDrawn == 0) {
-        gIsGameOver = true;
-        displayWinner();
-    }
-}
-
-function displayWinner() {
-    drawGamePanel();
-    gCanvas.fillStyle = "white";
-    gCanvas.font = "40px Microsoft Sans Serif"
-    gCanvas.fillText("Invaders Defeated", 40, 400)
-}
-
-function displayGameOver() {
-    drawGamePanel();
-    gCanvas.fillStyle = "white";
-    gCanvas.font = "60px Microsoft Sans Serif"
-    gCanvas.fillText("Game Over", 60, 400)
-}
-
-function drawBullets() {
-    for (var i = 0; i < gBullets.length; i++) {
-        if (gBullets[i].OnScreen === true) {
-            gCanvas.fillStyle = "green";
-            gBullets[i].Y -= 10;
-            gCanvas.fillRect(gBullets[i].X, gBullets[i].Y, gBullets[i].Width, gBullets[i].Height);
-        }
-
-        if (gBullets[i].Y < -20) {
-            gBullets[i].OnScreen = false;
-        }
-
-        if (gBullets[i].Fired === true && gBullets[i].OnScreen === false) {
-            gCanvas.fillStyle = "green";
-            gBullets[i].X = gShip.X + gShip.Width / 2;
-            gBullets[i].Y = gShip.Y - gBullets[i].Height;
-            gCanvas.fillRect(gBullets[i].X, gBullets[i].Y, gBullets[i].Width, gBullets[i].Height);
-            gBullets[i].Fired = false; 
-            gBullets[i].OnScreen = true;
-        }
-    }
-}
-
-function drawShip(event) {
-    if (gShip.X <= -140) {
-        gShip.X = 300;
-    }
-
-    if (gShip.X >= 440) {
-        gShip.X = 0;
-    }
-
-    gCanvas.fillStyle = "purple";
-    gCanvas.fillRect(gShip.X, gShip.Y, gShip.Width, gShip.Height);
 }
