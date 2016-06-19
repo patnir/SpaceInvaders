@@ -46,15 +46,16 @@ function gameInit() {
     gScore = 0;
     gHighScore = ditStorageGet('zip', 0)
     gCounter = 0;
+    
     gCanFire = true;
     gIsGameOver = false;
     gIsMouseDownOnShip = false;
     gIsGamePaused = false;
+    
     gInvaders = [];
     gBullets = [];
 
     totalInvaders = 9;
-    totalBullets = 3;
 
     invaderPositionX = 60;
     invaderPositionY = 30;
@@ -79,6 +80,9 @@ function gameInit() {
     gShip.Y = 900;
     gShip.Width = 150;
     gShip.Height = 30;
+
+    gBullets = [];
+    totalBullets = 3;
 
     for (var i = 0; i < totalBullets; i++) {
         gBullets[i] = new Object();
